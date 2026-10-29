@@ -62,6 +62,19 @@ export async function generateMetadata({ params, searchParams }) {
   return {
     title: `WatchRelax | Official 4K Movie Trailers, OTT Release Dates & Legal Streams in ${countryUpper}`,
     description: `Browse trending, now playing, top-rated, and categorized movies in ${countryUpper}. Verified Netflix, Disney+, and Prime Video streaming guide.`,
+    keywords: [
+      `where to watch movies in ${countryUpper}`,
+      `ott release dates ${countryUpper}`,
+      `new movies on ott this week`,
+      `trending movies today ${countryUpper}`,
+      `now playing movies in theaters ${countryUpper}`,
+      `netflix movies ${countryUpper}`,
+      `prime video streaming guide`,
+      `disney plus hotstar release dates`,
+      `watch official 4k trailers`,
+      `free movie streaming with ads`,
+      `upcoming ott release calendar`,
+    ],
   };
 }
 
