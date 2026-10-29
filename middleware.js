@@ -7,7 +7,7 @@ const COUNTRY_PATH_REGEX = /^\/([a-z]{2})(\/.*)?$/i;
  * Multi-Tier Intelligent Region Detection:
  * 1. User-selected preference stored in cookie ('watchrelax_country')
  * 2. CloudFront Edge Headers on AWS Amplify ('cloudfront-viewer-country')
- * 3. Fallback Accept-Language header (critical for localhost development from India/other regions)
+ * 3. Fallback Accept-Language header (critical for localhost development)
  * 4. Default fallback ('us')
  */
 function detectViewerCountry(request) {
@@ -29,7 +29,7 @@ function detectViewerCountry(request) {
     return edgeCountry.toLowerCase();
   }
 
-  // Tier 3: Accept-Language Browser Locale Fallback (Localhost & Dev Support)
+  // Tier 3: Accept-Language Browser Locale Fallback
   const acceptLanguage = request.headers.get('accept-language') || '';
 
   // Detect Indian locale codes (-IN, hi, ta, te, bn, mr, gu, kn, ml, pa)
@@ -50,15 +50,17 @@ function detectViewerCountry(request) {
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Ignore static assets, internal next routes, sitemaps, robots, and API endpoints
+  // Ignore static assets, internal next routes, sitemaps, robots, icons, and API endpoints
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/static') ||
     pathname.includes('.') ||
     pathname === '/favicon.ico' ||
+    pathname === '/icon.svg' ||
     pathname === '/sitemap.xml' ||
-    pathname === '/robots.txt'
+    pathname === '/robots.txt' ||
+    pathname === '/feed.xml'
   ) {
     return NextResponse.next();
   }
@@ -68,12 +70,19 @@ export function middleware(request) {
   // Check if pathname already begins with a 2-letter country code (e.g., /in, /us, /gb)
   const match = pathname.match(COUNTRY_PATH_REGEX);
 
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-user-country', match ? match[1].toLowerCase() : userCountry);
+
   if (!match) {
-    // Case 1: Root path "/" -> Redirect to detected localized country path "/[country]"
+    // Case 1: Root path "/" -> REWRITE internally to localized view
+    // CRITICAL FOR SEO & GOOGLEBOT: Returns HTTP 200 OK directly, eliminating Googlebot redirect errors!
     if (pathname === '/') {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${userCountry}`;
-      const response = NextResponse.redirect(url);
+      const rewriteUrl = new URL(`/${userCountry}`, request.url);
+      const response = NextResponse.rewrite(rewriteUrl, {
+        request: {
+          headers: requestHeaders,
+        },
+      });
       response.cookies.set('watchrelax_country', userCountry, {
         maxAge: 60 * 60 * 24 * 30, // 30 days
         path: '/',
@@ -82,11 +91,10 @@ export function middleware(request) {
       return response;
     }
 
-    // Case 2: Direct unlocalized movie path e.g. "/movie/123" -> Redirect to "/[country]/movie/123"
+    // Case 2: Direct unlocalized movie path e.g. "/movie/123" -> 301 Permanent Redirect to canonical regional path
     if (pathname.startsWith('/movie/')) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${userCountry}${pathname}`;
-      const response = NextResponse.redirect(url);
+      const redirectUrl = new URL(`/${userCountry}${pathname}`, request.url);
+      const response = NextResponse.redirect(redirectUrl, 301);
       response.cookies.set('watchrelax_country', userCountry, {
         maxAge: 60 * 60 * 24 * 30,
         path: '/',
@@ -95,10 +103,6 @@ export function middleware(request) {
       return response;
     }
   }
-
-  // Clone headers and append detected country for server components
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-user-country', match ? match[1].toLowerCase() : userCountry);
 
   return NextResponse.next({
     request: {
@@ -114,9 +118,9 @@ export const config = {
      * - api routes
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - sitemap.xml, robots.txt
+     * - favicon.ico, icon.svg
+     * - sitemap.xml, robots.txt, feed.xml
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|icon.svg|sitemap.xml|robots.txt|feed.xml).*)',
   ],
 };
