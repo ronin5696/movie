@@ -16,6 +16,7 @@ export default function robots() {
     ],
     sitemap: [
       `${SITE_URL}/sitemap.xml`,
+      `${SITE_URL}/feed.xml`,
     ],
   };
 }
