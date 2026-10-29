@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0e1015;
+  --foreground: #f4f4f5;
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Modern Typography Styling */
+h1, h2, h3, h4, .font-heading {
+  font-family: var(--font-outfit), var(--font-jakarta), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Clean Cinematic Card & Panel Utilities */
+.glass-panel {
+  background: #16171d;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: #14151b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(245, 197, 24, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6);
+}
+
+/* Hide scrollbar for cross-browser mobile touch shelves */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom cinematic desktop scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0e1015;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #232630;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #363b4a;
+}
