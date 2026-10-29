@@ -9,7 +9,7 @@ export async function GET() {
   const rssItems = movies.slice(0, 30).map((movie) => {
     const slug = getMovieSlug(movie.id, movie.title);
     const movieUrl = `${siteUrl}/us/movie/${slug}`;
-    const pubDate = movie.release_date ? new Date(movie.release_date).toUTCString() : new Date().toUTCString();
+    const pubDate = new Date().toUTCString();
     const cleanOverview = (movie.overview || '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')

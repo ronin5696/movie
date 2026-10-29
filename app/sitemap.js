@@ -70,12 +70,11 @@ export default async function sitemap() {
   const movieRoutes = [];
   for (const movie of uniqueMovies) {
     const movieSlug = getMovieSlug(movie.id, movie.title);
-    const movieLastModified = movie.release_date ? new Date(movie.release_date) : now;
 
     for (const region of PRIMARY_REGIONS) {
       movieRoutes.push({
         url: `${SITE_URL}/${region}/movie/${movieSlug}`,
-        lastModified: movieLastModified,
+        lastModified: now,
         changeFrequency: 'daily',
         priority: 0.8,
       });
