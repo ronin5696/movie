@@ -1,5 +1,6 @@
 import './globals.css';
 import Link from 'next/link';
+import Script from 'next/script';
 import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import { Play, TrendingUp, ShieldCheck, Sparkles } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
@@ -18,6 +19,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
+const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-YJX5KKVZLT';
 
 export const viewport = {
   width: 'device-width',
@@ -111,6 +113,26 @@ export default function RootLayout({ children }) {
       data-scroll-behavior="smooth"
     >
       <body className="min-h-screen bg-[#0e1015] text-zinc-100 flex flex-col font-sans antialiased selection:bg-[#f5c518] selection:text-black">
+        {/* Google tag (gtag.js) */}
+        {GA_TRACKING_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_TRACKING_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `}
+            </Script>
+          </>
+        )}
+
         {/* Navigation Bar */}
         <header className="sticky top-0 z-50 glass-panel border-b border-white/[0.08]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
