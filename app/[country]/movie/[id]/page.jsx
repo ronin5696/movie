@@ -38,6 +38,9 @@ import MovieFaqAccordion from '@/components/MovieFaqAccordion';
 import CastWindow from '@/components/CastWindow';
 import DownloadGuide from '@/components/DownloadGuide';
 import MovieEditorialBlog from '@/components/MovieEditorialBlog';
+import ShareBar from '@/components/ShareBar';
+import WatchlistButton from '@/components/WatchlistButton';
+import MovieShelf from '@/components/MovieShelf';
 
 const EDITORIAL_BASE_URL = process.env.NEXT_PUBLIC_EDITORIAL_SITE_URL || 'https://editorial-moviesite.com';
 
@@ -90,12 +93,15 @@ export async function generateMetadata({ params }) {
       title,
       description,
       type: 'video.movie',
+      url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site'}/${(country || 'us').toLowerCase()}/movie/${getMovieSlug(movie.id, movie.title)}`,
+      siteName: 'WatchRelax',
       images: backdropUrl ? [{ url: backdropUrl, width: 1280, height: 720, alt: movie.title }] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      site: '@watchrelax',
       images: backdropUrl ? [backdropUrl] : [],
     },
     alternates: {
@@ -126,6 +132,7 @@ export default async function MovieDetailPage({ params }) {
   const directors = movie.credits?.crew?.filter((c) => c.job === 'Director') || [];
   const writers = movie.credits?.crew?.filter((c) => ['Screenplay', 'Writer', 'Story', 'Novel'].includes(c.job)) || [];
   const topCast = movie.credits?.cast?.slice(0, 4) || [];
+  const similarMovies = (movie.similar?.results || []).slice(0, 15);
 
   // Programmatic Traffic Engines
   const timeline = getStreamingTimeline(movie.release_date, movie.production_companies);
@@ -452,25 +459,36 @@ export default async function MovieDetailPage({ params }) {
             </div>
           </section>
 
-          {/* GENRE PILLS & WEB STORY BAR */}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
-            <Link
-              href={`/stories/${getMovieSlug(movie.id, movie.title)}`}
-              target="_blank"
-              className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-[#f5c518]/15 hover:bg-[#f5c518]/25 text-[#f5c518] border border-[#f5c518]/30 transition-colors inline-flex items-center gap-1.5"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Web Story</span>
-            </Link>
-            {movie.genres && movie.genres.map((g) => (
+          {/* ACTION, GENRE PILLS & SOCIAL SHARE BAR */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <WatchlistButton movie={movie} />
+
               <Link
-                key={g.id}
-                href={`/${countryCode}?genre=${g.id}`}
-                className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[#1c1e26] hover:bg-[#252834] text-zinc-200 border border-white/[0.08] hover:border-[#f5c518]/50 transition-colors"
+                href={`/stories/${getMovieSlug(movie.id, movie.title)}`}
+                target="_blank"
+                className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-[#f5c518]/15 hover:bg-[#f5c518]/25 text-[#f5c518] border border-[#f5c518]/30 transition-colors inline-flex items-center gap-1.5"
+                title="View mobile Google Web Story"
               >
-                {g.name}
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Web Story</span>
               </Link>
-            ))}
+
+              {movie.genres && movie.genres.map((g) => (
+                <Link
+                  key={g.id}
+                  href={`/${countryCode}?genre=${g.id}`}
+                  className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[#1c1e26] hover:bg-[#252834] text-zinc-200 border border-white/[0.08] hover:border-[#f5c518]/50 transition-colors"
+                >
+                  {g.name}
+                </Link>
+              ))}
+            </div>
+
+            <ShareBar
+              title={movie.title}
+              url={`/${countryCode}/movie/${getMovieSlug(movie.id, movie.title)}`}
+            />
           </div>
 
           {/* MAIN TWO-COLUMN CONTENT LAYOUT */}
@@ -768,6 +786,19 @@ export default async function MovieDetailPage({ params }) {
             </div>
 
           </div>
+
+          {/* SIMILAR MOVIES & AUDIENCE RECOMMENDATIONS SHELF */}
+          {similarMovies.length > 0 && (
+            <div className="pt-12 sm:pt-16 border-t border-white/[0.08] mt-12 sm:mt-16">
+              <MovieShelf
+                title={`More Movies Like ${movie.title}`}
+                subtitle="Audience recommendations, similar cinematic themes &amp; genre companions"
+                movies={similarMovies}
+                country={countryCode}
+                seeAllHref={movie.genres?.[0]?.id ? `/${countryCode}?genre=${movie.genres[0].id}` : `/${countryCode}`}
+              />
+            </div>
+          )}
 
         </div>
       </article>

@@ -5,6 +5,7 @@ import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import { Play, TrendingUp, ShieldCheck, Sparkles } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import CountrySelector from '@/components/CountrySelector';
+import WatchlistNavBadge from '@/components/WatchlistNavBadge';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -20,6 +21,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-YJX5KKVZLT';
+const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
 
 export const viewport = {
   width: 'device-width',
@@ -133,6 +135,29 @@ export default function RootLayout({ children }) {
           </>
         )}
 
+        {/* OneSignal Web Push Notifications */}
+        {ONESIGNAL_APP_ID && (
+          <>
+            <Script
+              src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+              strategy="lazyOnload"
+            />
+            <Script id="onesignal-init" strategy="lazyOnload">
+              {`
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                OneSignalDeferred.push(async function(OneSignal) {
+                  await OneSignal.init({
+                    appId: "${ONESIGNAL_APP_ID}",
+                    notifyButton: {
+                      enable: true,
+                    },
+                  });
+                });
+              `}
+            </Script>
+          </>
+        )}
+
         {/* Navigation Bar */}
         <header className="sticky top-0 z-50 glass-panel border-b border-white/[0.08]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4">
@@ -162,6 +187,7 @@ export default function RootLayout({ children }) {
                 <TrendingUp className="w-4 h-4 text-[#f5c518]" />
                 <span>Trending</span>
               </Link>
+              <WatchlistNavBadge />
               <span className="hidden sm:inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-white/5 text-zinc-300 border border-white/10">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 Verified Streams

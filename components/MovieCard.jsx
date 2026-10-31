@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Play, Star } from 'lucide-react';
 import { tmdbImage, getMovieSlug } from '@/lib/tmdb';
+import WatchlistButton from './WatchlistButton';
 
 export default function MovieCard({ movie, country = 'us', priority = false }) {
   if (!movie) return null;
@@ -33,9 +34,14 @@ export default function MovieCard({ movie, country = 'us', priority = false }) {
           </div>
         )}
 
+        {/* Quick Watchlist Bookmark Button */}
+        <div className="absolute top-2 left-2 z-20">
+          <WatchlistButton movie={movie} size="small" />
+        </div>
+
         {/* IMDb-Style Rating Badge */}
         {movie.vote_average > 0 && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/85 backdrop-blur-md text-[11px] font-bold text-[#f5c518] border border-white/10 shadow-lg">
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-black/85 backdrop-blur-md text-[11px] font-bold text-[#f5c518] border border-white/10 shadow-lg z-10">
             <Star className="w-3 h-3 fill-[#f5c518]" />
             {movie.vote_average.toFixed(1)}
           </div>
