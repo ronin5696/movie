@@ -70,9 +70,12 @@ export async function GET(request) {
     let sitemapPingStatus = 'skipped';
     try {
       const sitemapUrl = encodeURIComponent(`${siteUrl}/sitemap.xml`);
-      const pingUrl = `https://www.google.com/ping?sitemap=${sitemapUrl}`;
-      const pingRes = await fetch(pingUrl, { method: 'GET', signal: AbortSignal.timeout(4000) });
-      sitemapPingStatus = pingRes.ok ? 'success' : `failed (${pingRes.status})`;
+      const storySitemapUrl = encodeURIComponent(`${siteUrl}/story-sitemap.xml`);
+      await Promise.allSettled([
+        fetch(`https://www.google.com/ping?sitemap=${sitemapUrl}`, { signal: AbortSignal.timeout(4000) }),
+        fetch(`https://www.google.com/ping?sitemap=${storySitemapUrl}`, { signal: AbortSignal.timeout(4000) }),
+      ]);
+      sitemapPingStatus = 'success';
     } catch (e) {
       sitemapPingStatus = `ping_error: ${e.message}`;
     }

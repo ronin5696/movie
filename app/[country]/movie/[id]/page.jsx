@@ -452,20 +452,26 @@ export default async function MovieDetailPage({ params }) {
             </div>
           </section>
 
-          {/* GENRE PILLS BAR (IMDb Rounded Tags) */}
-          {movie.genres && movie.genres.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              {movie.genres.map((g) => (
-                <Link
-                  key={g.id}
-                  href={`/${countryCode}?genre=${g.id}`}
-                  className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[#1c1e26] hover:bg-[#252834] text-zinc-200 border border-white/[0.08] hover:border-[#f5c518]/50 transition-colors"
-                >
-                  {g.name}
-                </Link>
-              ))}
-            </div>
-          )}
+          {/* GENRE PILLS & WEB STORY BAR */}
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <Link
+              href={`/stories/${getMovieSlug(movie.id, movie.title)}`}
+              target="_blank"
+              className="text-xs font-bold px-3.5 py-1.5 rounded-full bg-[#f5c518]/15 hover:bg-[#f5c518]/25 text-[#f5c518] border border-[#f5c518]/30 transition-colors inline-flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Web Story</span>
+            </Link>
+            {movie.genres && movie.genres.map((g) => (
+              <Link
+                key={g.id}
+                href={`/${countryCode}?genre=${g.id}`}
+                className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-[#1c1e26] hover:bg-[#252834] text-zinc-200 border border-white/[0.08] hover:border-[#f5c518]/50 transition-colors"
+              >
+                {g.name}
+              </Link>
+            ))}
+          </div>
 
           {/* MAIN TWO-COLUMN CONTENT LAYOUT */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
