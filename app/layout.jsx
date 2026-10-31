@@ -21,7 +21,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-YJX5KKVZLT';
-const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || '5f4f7789-2c6a-41d3-8c43-ad3cb139b0e7';
 
 export const viewport = {
   width: 'device-width',
