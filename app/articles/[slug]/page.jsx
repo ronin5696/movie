@@ -3,17 +3,25 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, Clock, Calendar, BookOpen, Share2 } from 'lucide-react';
 import { ARTICLES } from '@/lib/articlesData';
+import { getAllArticles, getWeeklyArticleBySlug } from '@/lib/weeklyArticles';
 import ShareBar from '@/components/ShareBar';
 
+async function resolveArticle(slug) {
+  const staticArticle = ARTICLES.find((a) => a.slug === slug);
+  if (staticArticle) return staticArticle;
+  return await getWeeklyArticleBySlug(slug);
+}
+
 export async function generateStaticParams() {
-  return ARTICLES.map((article) => ({
+  const all = getAllArticles();
+  return all.map((article) => ({
     slug: article.slug,
   }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const article = ARTICLES.find((a) => a.slug === slug);
+  const article = await resolveArticle(slug);
 
   if (!article) {
     return { title: 'Article Not Found | WatchRelax' };
@@ -55,7 +63,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ArticleDetailPage({ params }) {
   const { slug } = await params;
-  const article = ARTICLES.find((a) => a.slug === slug);
+  const article = await resolveArticle(slug);
 
   if (!article) {
     notFound();
@@ -63,7 +71,8 @@ export default async function ArticleDetailPage({ params }) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
   const articleUrl = `${siteUrl}/articles/${article.slug}`;
-  const otherArticles = ARTICLES.filter((a) => a.slug !== slug).slice(0, 3);
+  const allArticles = getAllArticles();
+  const otherArticles = allArticles.filter((a) => a.slug !== slug).slice(0, 3);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -267,3 +276,4 @@ export default async function ArticleDetailPage({ params }) {
     </>
   );
 }
+

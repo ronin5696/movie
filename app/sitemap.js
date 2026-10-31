@@ -8,7 +8,7 @@ import {
   getMovieSlug,
   MOVIE_GENRES 
 } from '@/lib/tmdb';
-import { ARTICLES } from '@/lib/articlesData';
+import { getAllArticles } from '@/lib/weeklyArticles';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
 
@@ -111,7 +111,7 @@ export default async function sitemap() {
       changeFrequency: 'daily',
       priority: 0.85,
     },
-    ...ARTICLES.map((article) => ({
+    ...getAllArticles().map((article) => ({
       url: `${SITE_URL}/articles/${article.slug}`,
       lastModified: new Date(article.publishedAt),
       changeFrequency: 'weekly',

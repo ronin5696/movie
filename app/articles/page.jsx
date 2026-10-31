@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Sparkles, Clock, Calendar, ArrowRight, User } from 'lucide-react';
-import { ARTICLES } from '@/lib/articlesData';
+import { getAllArticles } from '@/lib/weeklyArticles';
 
 export const metadata = {
   title: 'Editorial Cinema Guides, Analysis & Streaming Essays | WatchRelax',
@@ -14,8 +14,9 @@ export const metadata = {
 };
 
 export default function ArticlesIndexPage() {
-  const featuredArticle = ARTICLES[0];
-  const remainingArticles = ARTICLES.slice(1);
+  const allArticles = getAllArticles();
+  const featuredArticle = allArticles[0];
+  const remainingArticles = allArticles.slice(1);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 space-y-10 sm:space-y-14">
@@ -196,3 +197,4 @@ export default function ArticlesIndexPage() {
     </div>
   );
 }
+
