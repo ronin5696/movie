@@ -8,6 +8,7 @@ import {
   getMovieSlug,
   MOVIE_GENRES 
 } from '@/lib/tmdb';
+import { ARTICLES } from '@/lib/articlesData';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
 
@@ -104,6 +105,18 @@ export default async function sitemap() {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    {
+      url: `${SITE_URL}/articles`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    ...ARTICLES.map((article) => ({
+      url: `${SITE_URL}/articles/${article.slug}`,
+      lastModified: new Date(article.publishedAt),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    })),
     ...PRIMARY_REGIONS.map((region) => ({
       url: `${SITE_URL}/${region}`,
       lastModified: now,

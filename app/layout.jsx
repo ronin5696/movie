@@ -2,7 +2,7 @@ import './globals.css';
 import Link from 'next/link';
 import Script from 'next/script';
 import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
-import { Play, TrendingUp, ShieldCheck, Sparkles } from 'lucide-react';
+import { Play, TrendingUp, ShieldCheck, Sparkles, BookOpen } from 'lucide-react';
 import SearchBar from '@/components/SearchBar';
 import CountrySelector from '@/components/CountrySelector';
 import WatchlistNavBadge from '@/components/WatchlistNavBadge';
@@ -187,6 +187,14 @@ export default function RootLayout({ children }) {
                 <TrendingUp className="w-4 h-4 text-[#f5c518]" />
                 <span>Trending</span>
               </Link>
+              <Link
+                href="/articles"
+                className="flex items-center gap-1.5 hover:text-[#f5c518] transition-colors py-1 text-xs sm:text-sm font-semibold"
+                title="Read cinema essays and streaming guides"
+              >
+                <BookOpen className="w-4 h-4 text-[#f5c518]" />
+                <span>Guides</span>
+              </Link>
               <WatchlistNavBadge />
               <span className="hidden sm:inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg bg-white/5 text-zinc-300 border border-white/10">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -219,6 +227,9 @@ export default function RootLayout({ children }) {
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-white/5">
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-zinc-400 font-medium">
+                <Link href="/articles" className="hover:text-[#f5c518] transition-colors">
+                  Editorial Guides
+                </Link>
                 <Link href="/about" className="hover:text-[#f5c518] transition-colors">
                   About Us
                 </Link>
