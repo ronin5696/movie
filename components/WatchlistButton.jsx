@@ -111,3 +111,4 @@ export default function WatchlistButton({ movie, size = 'default' }) {
     </button>
   );
 }
+
