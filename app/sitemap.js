@@ -18,6 +18,9 @@ const PRIMARY_REGIONS = ['us', 'in', 'gb', 'ca', 'au', 'de', 'fr'];
 // Dedicated catalog types per region
 const CATALOG_TYPES = ['trending', 'now_playing', 'upcoming', 'top_rated'];
 
+// Re-generate sitemap automatically every 12 hours with fresh upcoming & trending releases
+export const revalidate = 43200;
+
 export default async function sitemap() {
   const now = new Date();
 
