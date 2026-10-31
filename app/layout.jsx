@@ -191,7 +191,28 @@ export default function RootLayout({ children }) {
                 Official 4K studio trailers embedded directly from verified studio channels.
               </p>
             </div>
-            <div className="pt-4 border-t border-white/5 text-[11px] leading-relaxed text-zinc-500">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-white/5">
+              <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-zinc-400 font-medium">
+                <Link href="/about" className="hover:text-[#f5c518] transition-colors">
+                  About Us
+                </Link>
+                <Link href="/privacy" className="hover:text-[#f5c518] transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="hover:text-[#f5c518] transition-colors">
+                  Terms of Service
+                </Link>
+                <Link href="/contact" className="hover:text-[#f5c518] transition-colors">
+                  Contact Us
+                </Link>
+              </div>
+
+              <div className="text-[11px] text-zinc-500">
+                &copy; {new Date().getFullYear()} WatchRelax. All rights reserved.
+              </div>
+            </div>
+
+            <div className="text-[11px] leading-relaxed text-zinc-600">
               WatchRelax (watchrelax.site) utilizes the TMDB API and JustWatch data but is not endorsed or certified by TMDB. 
               All trademarks, movie titles, and platform logos (Netflix, Disney+, Prime Video, Apple TV+, etc.) 
               belong to their respective copyright holders. No copyright infringement is intended.

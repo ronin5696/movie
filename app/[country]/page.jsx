@@ -18,6 +18,7 @@ import {
   getTrendingMovies, 
   getNowPlayingMovies, 
   getTopRatedMovies, 
+  getUpcomingMovies,
   getMoviesByGenre, 
   getPopularMovies,
   searchMovies,
@@ -56,6 +57,13 @@ export async function generateMetadata({ params, searchParams }) {
     return {
       title: `Trending Movies & 4K Trailers in ${countryUpper} | WatchRelax`,
       description: `Explore all trending movies today with official trailers and legal streams on WatchRelax.`,
+    };
+  }
+
+  if (type === 'upcoming') {
+    return {
+      title: `Upcoming Movies & OTT Releases in ${countryUpper} | WatchRelax`,
+      description: `Anticipated theatrical blockbusters, upcoming Netflix, Prime & Disney+ streaming release dates in ${countryUpper}.`,
     };
   }
 
@@ -216,6 +224,9 @@ export default async function CountryHomePage({ params, searchParams }) {
     } else if (type === 'now_playing') {
       typeTitle = `In Theaters & Now Playing in ${countryUpper}`;
       initialTypeMovies = await getNowPlayingMovies(countryCode, 1);
+    } else if (type === 'upcoming') {
+      typeTitle = `Upcoming Movies & OTT Releases in ${countryUpper}`;
+      initialTypeMovies = await getUpcomingMovies(countryCode, 1);
     } else if (type === 'top_rated') {
       typeTitle = 'All-Time Highest Rated Masterpieces';
       initialTypeMovies = await getTopRatedMovies(1);
@@ -264,6 +275,7 @@ export default async function CountryHomePage({ params, searchParams }) {
   const [
     trending,
     nowPlaying,
+    upcoming,
     topRated,
     sciFiMovies,
     horrorMovies,
@@ -271,6 +283,7 @@ export default async function CountryHomePage({ params, searchParams }) {
   ] = await Promise.all([
     getTrendingMovies('day', 1),
     getNowPlayingMovies(countryCode, 1),
+    getUpcomingMovies(countryCode, 1),
     getTopRatedMovies(1),
     getMoviesByGenre(878, 1), // Sci-Fi
     getMoviesByGenre(27, 1),  // Horror
@@ -354,6 +367,13 @@ export default async function CountryHomePage({ params, searchParams }) {
             >
               All Movies
             </Link>
+            <Link
+              href={`/${countryCode}?type=upcoming`}
+              className="px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-white/5 border border-[#f5c518]/30 text-[#f5c518] hover:bg-[#f5c518]/15 transition-all flex-shrink-0 flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Upcoming</span>
+            </Link>
             {MOVIE_GENRES.map((g) => (
               <Link
                 key={g.id}
@@ -393,7 +413,21 @@ export default async function CountryHomePage({ params, searchParams }) {
         </div>
       )}
 
-      {/* SECTION 3: TOP RATED MASTERPIECES */}
+      {/* SECTION 3: UPCOMING MOVIES & OTT RELEASES */}
+      {upcoming.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <MovieShelf
+            title={`Upcoming Movies & OTT Releases`}
+            subtitle="Anticipated blockbusters and upcoming streaming releases"
+            iconName="sparkles"
+            movies={upcoming}
+            country={countryCode}
+            seeAllHref={`/${countryCode}?type=upcoming`}
+          />
+        </div>
+      )}
+
+      {/* SECTION 4: TOP RATED MASTERPIECES */}
       {topRated.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <MovieShelf

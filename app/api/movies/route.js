@@ -5,6 +5,7 @@ import {
   getTrendingMovies,
   getNowPlayingMovies,
   getTopRatedMovies,
+  getUpcomingMovies,
   searchMovies,
 } from '@/lib/tmdb';
 
@@ -37,6 +38,9 @@ export async function GET(request) {
         break;
       case 'now_playing':
         movies = await getNowPlayingMovies(country, page);
+        break;
+      case 'upcoming':
+        movies = await getUpcomingMovies(country, page);
         break;
       case 'top_rated':
         movies = await getTopRatedMovies(page);

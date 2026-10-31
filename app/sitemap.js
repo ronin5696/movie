@@ -2,33 +2,69 @@ import {
   getTrendingMovies, 
   getNowPlayingMovies, 
   getTopRatedMovies, 
+  getUpcomingMovies,
   getPopularMovies,
+  getMoviesByGenre,
   getMovieSlug,
   MOVIE_GENRES 
 } from '@/lib/tmdb';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
 
-// Primary country tiers for programmatic global coverage
-const PRIMARY_REGIONS = ['us', 'gb', 'ca', 'in', 'au'];
+// All 7 supported country tiers for programmatic global coverage
+const PRIMARY_REGIONS = ['us', 'in', 'gb', 'ca', 'au', 'de', 'fr'];
+
+// Dedicated catalog types per region
+const CATALOG_TYPES = ['trending', 'now_playing', 'upcoming', 'top_rated'];
 
 export default async function sitemap() {
   const now = new Date();
 
-  // Fetch diverse movie pools in parallel to maximize Google Search & Discover indexation
-  const [trendingDay, trendingWeek, nowPlaying, topRated, popular1, popular2] = await Promise.all([
-    getTrendingMovies('day', 1),
-    getTrendingMovies('week', 1),
-    getNowPlayingMovies('US', 1),
-    getTopRatedMovies(1),
-    getPopularMovies(1),
-    getPopularMovies(2),
+  // Comprehensive parallel fetch across trending, upcoming, now playing, popular, top-rated & all genres
+  const genrePromises = MOVIE_GENRES.flatMap((g) => [
+    getMoviesByGenre(g.id, 1),
+    getMoviesByGenre(g.id, 2),
   ]);
 
-  // Combine and deduplicate movies by ID
-  const allMovies = [...trendingDay, ...trendingWeek, ...nowPlaying, ...topRated, ...popular1, ...popular2];
+  const popularPromises = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((p) => getPopularMovies(p));
+  const topRatedPromises = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((p) => getTopRatedMovies(p));
+
+  const upcomingPromises = [
+    getUpcomingMovies('US', 1),
+    getUpcomingMovies('US', 2),
+    getUpcomingMovies('US', 3),
+    getUpcomingMovies('IN', 1),
+    getUpcomingMovies('IN', 2),
+    getUpcomingMovies('GB', 1),
+  ];
+
+  const nowPlayingPromises = [
+    getNowPlayingMovies('US', 1),
+    getNowPlayingMovies('US', 2),
+    getNowPlayingMovies('IN', 1),
+    getNowPlayingMovies('IN', 2),
+    getNowPlayingMovies('GB', 1),
+  ];
+
+  const trendingPromises = [
+    getTrendingMovies('day', 1),
+    getTrendingMovies('day', 2),
+    getTrendingMovies('week', 1),
+    getTrendingMovies('week', 2),
+  ];
+
+  const allResults = await Promise.all([
+    ...trendingPromises,
+    ...upcomingPromises,
+    ...nowPlayingPromises,
+    ...popularPromises,
+    ...topRatedPromises,
+    ...genrePromises,
+  ]);
+
+  // Combine and deduplicate movies by numeric ID
   const uniqueMoviesMap = new Map();
-  allMovies.forEach((m) => {
+  allResults.flat().forEach((m) => {
     if (m && m.id && !uniqueMoviesMap.has(m.id)) {
       uniqueMoviesMap.set(m.id, m);
     }
@@ -36,13 +72,37 @@ export default async function sitemap() {
 
   const uniqueMovies = Array.from(uniqueMoviesMap.values());
 
-  // 1. Root and Regional Homepages
+  // 1. Root, Regional Homepages & Mandatory Compliance Pages
   const staticRoutes = [
     {
       url: `${SITE_URL}`,
       lastModified: now,
       changeFrequency: 'hourly',
       priority: 1.0,
+    },
+    {
+      url: `${SITE_URL}/about`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/privacy`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/terms`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     ...PRIMARY_REGIONS.map((region) => ({
       url: `${SITE_URL}/${region}`,
@@ -52,7 +112,20 @@ export default async function sitemap() {
     })),
   ];
 
-  // 2. Regional Genre Category Pages (e.g. /us?genre=28, /gb?genre=878)
+  // 2. Regional Hub Types (e.g. /us?type=upcoming, /in?type=trending)
+  const typeRoutes = [];
+  for (const region of PRIMARY_REGIONS) {
+    for (const catType of CATALOG_TYPES) {
+      typeRoutes.push({
+        url: `${SITE_URL}/${region}?type=${catType}`,
+        lastModified: now,
+        changeFrequency: 'daily',
+        priority: 0.9,
+      });
+    }
+  }
+
+  // 3. Regional Genre Category Pages (e.g. /us?genre=28, /in?genre=878)
   const categoryRoutes = [];
   for (const region of PRIMARY_REGIONS) {
     for (const genre of MOVIE_GENRES) {
@@ -65,7 +138,7 @@ export default async function sitemap() {
     }
   }
 
-  // 3. SEO Slugified Movie URLs across primary global regions
+  // 4. SEO Slugified Movie URLs across all 7 global regions
   // Format: https://site.com/[region]/movie/[id]-[movie-slug]
   const movieRoutes = [];
   for (const movie of uniqueMovies) {
@@ -81,5 +154,5 @@ export default async function sitemap() {
     }
   }
 
-  return [...staticRoutes, ...categoryRoutes, ...movieRoutes];
+  return [...staticRoutes, ...typeRoutes, ...categoryRoutes, ...movieRoutes];
 }

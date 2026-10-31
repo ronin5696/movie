@@ -1,12 +1,26 @@
-import { getTrendingMovies, getMovieSlug } from '@/lib/tmdb';
+import { getTrendingMovies, getUpcomingMovies, getMovieSlug } from '@/lib/tmdb';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://watchrelax.site';
-  const movies = await getTrendingMovies('day', 1);
+  
+  const [trending, upcoming] = await Promise.all([
+    getTrendingMovies('day', 1),
+    getUpcomingMovies('US', 1),
+  ]);
 
-  const rssItems = movies.slice(0, 30).map((movie) => {
+  // Combine and deduplicate
+  const feedMap = new Map();
+  [...trending, ...upcoming].forEach((m) => {
+    if (m && m.id && !feedMap.has(m.id)) {
+      feedMap.set(m.id, m);
+    }
+  });
+
+  const movies = Array.from(feedMap.values()).slice(0, 50);
+
+  const rssItems = movies.map((movie) => {
     const slug = getMovieSlug(movie.id, movie.title);
     const movieUrl = `${siteUrl}/us/movie/${slug}`;
     const pubDate = new Date().toUTCString();
